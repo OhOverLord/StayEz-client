@@ -3,13 +3,15 @@ import Hotels from './components/Hotels.vue'
 import HotelDetails from './components/HotelDetails.vue'
 import RoomReservation from './components/RoomReservation.vue'
 import ReservationDetails from './components/ReservationDetails.vue'
+import ReservationLookup from './components/ReservationLookup.vue'
 import NotFound from './components/NotFound.vue'
 
 const routes = [
   { path: '/', component: Hotels },
-  { path: '/hotel/:id', component: HotelDetails, props: true },
+  { path: '/hotel/:id', component: HotelDetails, name: 'HotelDetails', props: true },
   { path: '/reserve/:id', component: RoomReservation, props: true },
   { path: '/reservation-details/:id', component: ReservationDetails, props: true },
+  { path: '/reservation-lookup/:id', component: ReservationLookup, props: true },
   { path: '/:catchAll(.*)', component: NotFound }
 ]
 

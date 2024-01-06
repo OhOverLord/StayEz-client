@@ -1,5 +1,5 @@
 <template>
-    <div class="container mt-4">
+    <div class="container mt-4" id="reservation-container">
         <div v-if="showErrorAlert" class="alert alert-danger" role="alert">
             {{ errorMessage }}
         </div>
@@ -226,4 +226,7 @@
   </script>
   
   <style scoped>
+  #reservation-container {
+    margin-bottom: 100px;
+  }
   </style>  

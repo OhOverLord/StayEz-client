@@ -1,31 +1,34 @@
 <template>
-    <div class="container mt-4">
-      <div v-if="loading" class="text-center">
-        <div class="spinner-border text-primary" role="status">
-          <span class="visually-hidden">Loading...</span>
+  <div class="container mt-4">
+    <div v-if="loading" class="text-center">
+      <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Loading...</span>
+      </div>
+    </div>
+    <div v-else>
+      <div class="d-flex justify-content-between align-items-center">
+        <h2 class="mb-4">{{ hotel.name }} - Rooms</h2>
+        <router-link :to="`/reservation-lookup/${id}`" class="btn btn-secondary">My Reservations</router-link>
+      </div>
+      <div class="row">
+        <div class="col-md-4" v-for="room in rooms" :key="room.id">
+          <div class="card mb-4 room-card">
+            <div class="card-body">
+              <h5 class="card-title">Room {{ room.number }} - {{ room.type }}</h5>
+              <p class="card-text">
+                Guests: {{ room.guestsCount }}<br>
+                Price per night: ${{ room.pricePerNight }}<br>
+              </p>
+            </div>
+            <div class="card-footer">
+              <router-link :to="'/reserve/' + room.id" class="btn btn-primary">Reserve</router-link>
+            </div>
+          </div>
         </div>
       </div>
-        <div v-else>
-            <h2 class="mb-4">{{ hotel.name }} - Rooms</h2>
-            <div class="row">
-                <div class="col-md-4" v-for="room in rooms" :key="room.id">
-                <div class="card mb-4 room-card">
-                    <div class="card-body">
-                    <h5 class="card-title">Room {{ room.number }} - {{ room.type }}</h5>
-                    <p class="card-text">
-                        Guests: {{ room.guestsCount }}<br>
-                        Price per night: ${{ room.pricePerNight }}<br>
-                    </p>
-                    </div>
-                    <div class="card-footer">
-                    <router-link :to="'/reserve/' + room.id" class="btn btn-primary">Reserve</router-link>
-                    </div>
-                </div>
-                </div>
-            </div>
-            </div>
-        </div>
-  </template>
+    </div>
+  </div>
+</template>
   
   <script>
   export default {
