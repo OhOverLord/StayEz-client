@@ -147,34 +147,44 @@
         this.guests.splice(index, 1);
       },
       makeReservation() {
-      this.createCustomer().then(customerData => {
-        this.reservation.customerId = customerData.id;
-        this.reservation.roomId = this.room.id;
-        this.reservation.numberOfGuests = this.guests.length;
+    this.showErrorAlert = false;
+    this.errorMessage = '';
 
-        const guestPromises = this.guests.map(guest => this.createGuest(guest));
-        Promise.all(guestPromises).then(guestData => {
-          this.reservation.guestIds = guestData.map(g => g.id);
-          this.createReservation(this.reservation).then(reservationData => {
-            Swal.fire({
-              title: 'Success!',
-              text: 'Your reservation has been made.',
-              icon: 'success',
-              confirmButtonText: 'OK'
-            }).then(() => {
-              this.$router.push('/reservation-details/' + reservationData.id);
-            });
+    this.createCustomer().then(customerData => {
+      this.reservation.customerId = customerData.id;
+      this.reservation.roomId = this.room.id;
+      this.reservation.numberOfGuests = this.guests.length;
+
+      const guestPromises = this.guests.map(guest => this.createGuest(guest));
+      Promise.all(guestPromises).then(guestData => {
+        this.reservation.guestIds = guestData.map(g => g.id);
+        this.createReservation(this.reservation).then(reservationData => {
+          Swal.fire({
+            title: 'Success!',
+            text: 'Your reservation has been made.',
+            icon: 'success',
+            confirmButtonText: 'OK'
+          }).then(() => {
+            this.$router.push('/reservation-details/' + reservationData.id);
+          });
+        }).catch(error => {
+          Swal.fire({
+            title: 'Error!',
+            text: error.message,
+            icon: 'error',
+            confirmButtonText: 'OK'
           });
         });
-      }).catch(error => {
-        Swal.fire({
-          title: 'Error!',
-          text: error.toString(),
-          icon: 'error',
-          confirmButtonText: 'OK'
-        });
       });
-    },
+    }).catch(error => {
+      Swal.fire({
+        title: 'Error!',
+        text: error.toString(),
+        icon: 'error',
+        confirmButtonText: 'OK'
+      });
+    });
+  },
     createCustomer() {
       return fetch(`http://localhost:8080/customers`, {
         method: 'POST',
@@ -197,7 +207,19 @@
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(reservation)
       })
-      .then(response => response.ok ? response.json() : Promise.reject(response))
+      .then(response => {
+        if (response.ok) {
+          return response.json();
+        } else {
+          return response.text().then(text => {
+            if (response.status === 400 && text.includes('Room is not available for the selected dates')) {
+              throw new Error('Room is not available for the selected dates');
+            } else {
+              throw new Error(text || 'An unexpected error occurred');
+            }
+          });
+        }
+      });
     },
   },
   };

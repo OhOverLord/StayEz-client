@@ -1,6 +1,10 @@
 <template>
     <div class="container mt-4">
-        <div v-if="!hotel" class="loader"></div>
+      <div v-if="loading" class="text-center">
+        <div class="spinner-border text-primary" role="status">
+          <span class="visually-hidden">Loading...</span>
+        </div>
+      </div>
         <div v-else>
             <h2 class="mb-4">{{ hotel.name }} - Rooms</h2>
             <div class="row">
@@ -35,6 +39,7 @@
       return {
         hotel: null,
         rooms: [],
+        loading: true,
       }
     },
     created() {
@@ -51,48 +56,13 @@
           .then(responses => Promise.all(responses.map(res => res.json())))
           .then(rooms => {
             this.rooms = rooms;
+            this.loading = false;
           })
           .catch(error => {
             console.error('Error fetching hotel details:', error);
+            this.loading = false;
           });
       }
     }
   };
   </script>
-  
-
-<style scoped>
-.room-card:hover {
-  -webkit-box-shadow: 0 5px 15px rgba(0,0,0,0.3);
-  box-shadow: 0 5px 15px rgba(0,0,0,0.3);
-  transition: box-shadow 0.3s ease-in-out;
-}
-
-.loader,
-.loader:after {
-  border-radius: 50%;
-  width: 10em;
-  height: 10em;
-}
-.loader {
-  margin: 60px auto;
-  font-size: 10px;
-  position: relative;
-  text-indent: -9999em;
-  border-top: 1.1em solid rgba(0,0,0, 0.2);
-  border-right: 1.1em solid rgba(0,0,0, 0.2);
-  border-bottom: 1.1em solid rgba(0,0,0, 0.2);
-  border-left: 1.1em solid #000;
-  transform: translateZ(0);
-  animation: load8 1.1s infinite linear;
-}
-
-@keyframes load8 {
-  0% {
-    transform: rotate(0deg);
-  }
-  100% {
-    transform: rotate(360deg);
-  }
-}
-</style>
