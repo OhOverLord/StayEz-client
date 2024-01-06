@@ -51,15 +51,29 @@
     methods: {
       fetchHotelDetails() {
         fetch(`http://localhost:8080/hotels/${this.id}`)
-          .then(response => response.json())
-          .then(data => {
-            this.hotel = data;
-            return Promise.all(this.hotel.roomIds.map(id => fetch(`http://localhost:8080/rooms/${id}`)));
+          .then(response => {
+            if (response.status === 404 || response.status === 400) {
+              this.$router.push({ path: '/404' });
+            } else {
+              return response.json();
+            }
           })
-          .then(responses => Promise.all(responses.map(res => res.json())))
+          .then(data => {
+            if (data) {
+              this.hotel = data;
+              return Promise.all(this.hotel.roomIds.map(id => fetch(`http://localhost:8080/rooms/${id}`)));
+            }
+          })
+          .then(responses => {
+            if (responses) {
+              return Promise.all(responses.map(res => res.json()));
+            }
+          })
           .then(rooms => {
-            this.rooms = rooms;
-            this.loading = false;
+            if (rooms) {
+              this.rooms = rooms;
+              this.loading = false;
+            }
           })
           .catch(error => {
             console.error('Error fetching hotel details:', error);

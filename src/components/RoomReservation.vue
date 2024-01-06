@@ -122,10 +122,18 @@
     methods: {
       fetchRoomDetails() {
         fetch(`http://localhost:8080/rooms/${this.id}`)
-          .then(response => response.json())
+          .then(response => {
+            if (response.status === 404 || response.status === 400) {
+              this.$router.push('/404');
+            } else {
+              return response.json();
+            }
+          })
           .then(data => {
-            this.room = data;
-            this.loading = false;
+            if (data) {
+              this.room = data;
+              this.loading = false;
+            }
           })
           .catch(error => {
             console.error('Error fetching room details:', error);

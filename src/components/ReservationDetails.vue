@@ -48,15 +48,33 @@
     methods: {
       fetchReservationDetails(reservationId) {
         fetch(`http://localhost:8080/reservations/${reservationId}`)
-          .then(response => response.json())
+          .then(response => {
+            if (response.status === 404 || response.status === 400) {
+              throw new Error('Reservation not found');
+            }
+            return response.json();
+          })
           .then(data => {
             this.reservation = data;
             return fetch(`http://localhost:8080/customers/${this.reservation.customerId}`);
           })
-          .then(response => response.json())
+          .then(response => {
+            if (response.status === 404 || response.status === 400) {
+              throw new Error('Customer not found');
+            }
+            return response.json();
+          })
           .then(data => {
             this.customer = data;
-            const guestPromises = this.reservation.guestIds.map(id => fetch(`http://localhost:8080/guests/${id}`).then(response => response.json()));
+            const guestPromises = this.reservation.guestIds.map(id => 
+              fetch(`http://localhost:8080/guests/${id}`)
+                .then(response => {
+                  if (response.status === 404 || response.status === 400) {
+                    throw new Error('Guest not found');
+                  }
+                  return response.json();
+                })
+            );
             return Promise.all(guestPromises);
           })
           .then(guests => {
@@ -66,6 +84,9 @@
           .catch(error => {
             console.error('Error fetching reservation details:', error);
             this.loading = false;
+            if (error.message === 'Reservation not found' || error.message === 'Customer not found' || error.message === 'Guest not found') {
+              this.$router.push('/404');
+            }
           });
       }
     }

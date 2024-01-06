@@ -48,7 +48,26 @@
         loading: false
       };
     },
+    watch: {
+      '$route.params.id': {
+        immediate: true,
+        handler(newId) {
+          this.checkHotelExistence(newId);
+        }
+      }
+    },
     methods: {
+      checkHotelExistence(hotelId) {
+        fetch(`http://localhost:8080/hotels/${hotelId}`)
+          .then(response => {
+            if (response.status === 404 || response.status === 400) {
+              this.$router.push('/404');
+            }
+          })
+          .catch(error => {
+            console.error('Error checking hotel existence:', error);
+          });
+      },
       fetchCustomerReservations() {
         this.loading = true;
         fetch(`http://localhost:8080/customers/email/${this.customerEmail}`)
